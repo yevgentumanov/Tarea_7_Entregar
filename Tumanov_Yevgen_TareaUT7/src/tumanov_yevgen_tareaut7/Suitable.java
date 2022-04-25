@@ -10,6 +10,12 @@ package tumanov_yevgen_tareaut7;
  */
 public interface Suitable {
     
+    /**
+     *
+     * @param longitud
+     * @param ancho
+     * @throws AlojamientoInvalidoException
+     */
     void cabeEnParcela(int longitud, int ancho) throws AlojamientoInvalidoException;
 
 }
