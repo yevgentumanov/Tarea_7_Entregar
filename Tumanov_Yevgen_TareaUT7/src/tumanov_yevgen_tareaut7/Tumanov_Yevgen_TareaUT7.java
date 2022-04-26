@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Main.java to edit this template
- */
 package tumanov_yevgen_tareaut7;
 
 import java.util.HashMap;
@@ -9,30 +5,21 @@ import java.util.InputMismatchException;
 import java.util.Map;
 import java.util.Scanner;
 
-/**
- *
- * @author Euu
- */
 public class Tumanov_Yevgen_TareaUT7 {
 
-    /**
-     * @param args the command line arguments
-     */
     public static void main(String[] args) {
         // TODO code application logic here
         // Declaramos las variables
-        int opcionMenu; 
+        int opcionMenu;
         int parcelasDias[][] = new int[6][32];
-        int numParcela = 0; 
+        int numParcela = 0;
         HashMap<Integer, Cliente> listaClientes = new HashMap<>(); // lista clientes
         HashMap<Integer, Alojamiento> listaAlojamientos = new HashMap<>(); // lista alojamientos
         HashMap<Integer, Reserva> listaReservas = new HashMap<>(); // lista reservas
-
         do {
             System.out.println(menu());
             System.out.print("Opcion elegida: ");
             opcionMenu = intInput(1, 9);
-
             switch (opcionMenu) {
                 case 1:
                     System.out.println("1. Ver clientes");
@@ -105,7 +92,6 @@ public class Tumanov_Yevgen_TareaUT7 {
         boolean tieneAseo = false;
         boolean tieneMover = false;
         Scanner inAlta = new Scanner(System.in);
-
         System.out.print("Introduzca el nombre del cliente: ");
         NombreCompleto = inAlta.nextLine();
         System.out.print("Introduzca la fecha de nacimiento: ");
@@ -124,7 +110,6 @@ public class Tumanov_Yevgen_TareaUT7 {
         ancho = intInput();
         System.out.print("Tiene aseo 1. Si 2. No: ");
         opcionElegdia = intInput(1, 2);
-
         if (opcionElegdia == 1) {
             tieneAseo = true;
         }
@@ -163,16 +148,12 @@ public class Tumanov_Yevgen_TareaUT7 {
                 listaAlojamientos.put(idCCrear, new Autocaravana(Autocaravana.tipoAC.INTEGRAL, modelo, longitud, ancho, tieneAseo));
                 listaAlojamientos.get(idCCrear).cabeEnParcela(longitud, ancho);
             }
-            
         } catch (AlojamientoInvalidoException ex) {
             System.out.println("EL ALOJAMIENTO ES DEMASIADO GRANDE Y NO VA A CABER EN LA PARCELA");
         }
-
         listaClientes.put(idCCrear, new Cliente(NombreCompleto, DNI, FechaNac, idCCrear, listaAlojamientos.get(idCCrear)));
-
         System.out.println("Se ha creado un cliente con ID: " + idCCrear + "\nNombre: "
                 + NombreCompleto + "\nFecha de nacimiento: " + FechaNac + "\nDNI: " + DNI + "\nAlojamiento: " + listaAlojamientos.get(idCCrear).toString());
-
         idCliente++;
     }
 
@@ -319,34 +300,43 @@ public class Tumanov_Yevgen_TareaUT7 {
     }
 
     public static void realizarReserva(HashMap<Integer, Reserva> listaReservas, HashMap<Integer, Cliente> listaClientes, int parcelasDias[][]) {
+        boolean error = true;
         int idClientQueReserva = 0;
         int idResRealizada = idReserva;
         int numParcela, fechaInicio, fechaFin;
-        if (listaClientes.size() != 0) {
+        if (!listaClientes.isEmpty()) {
             for (Map.Entry<Integer, Cliente> e : listaClientes.entrySet()) {
                 System.out.println("ID:" + e.getValue().getIdCliente() + " Nombre Completo: " + e.getValue().getNombreCompleto());
             }
             System.out.print("Introduzca el ID del cliente: ");
             idClientQueReserva = intInput(1, listaClientes.size());
-            System.out.print("Introduzca el numero de parcela: ");
-            numParcela = intInput(1, 5);
-            System.out.print("Introduzca la fecha de inicio: ");
-            fechaInicio = intInput(1, 31);
-            System.out.print("Introduzca la fecha fin: ");
-            fechaFin = intInput(1, 31);
-            listaReservas.put(idResRealizada, new Reserva(idResRealizada, listaClientes.get(idClientQueReserva), numParcela, fechaInicio, fechaFin));
-            for (int i = fechaInicio; i <= fechaFin; i++) {
-                parcelasDias[numParcela][i] = idClientQueReserva;
+            try {
+                listaClientes.get(idClientQueReserva).getVehiculo().cabeEnParcela(listaClientes.get(idClientQueReserva).getVehiculo().getLongitud(), listaClientes.get(idClientQueReserva).getVehiculo().getAncho());
+            } catch (AlojamientoInvalidoException ex) {
+                System.out.println("\nNo se puede hacer la reserva para este cliente!"
+                        + "\nSu vehiculo es demasiado grande.\n");
+                error = false;
             }
-            idReserva++;
+            if (error) {
+                System.out.print("Introduzca el numero de parcela: ");
+                numParcela = intInput(1, 5);
+                System.out.print("Introduzca la fecha de inicio: ");
+                fechaInicio = intInput(1, 31);
+                System.out.print("Introduzca la fecha fin: ");
+                fechaFin = intInput(1, 31);
+                listaReservas.put(idResRealizada, new Reserva(idResRealizada, listaClientes.get(idClientQueReserva), numParcela, fechaInicio, fechaFin));
+                for (int i = fechaInicio; i <= fechaFin; i++) {
+                    parcelasDias[numParcela][i] = idClientQueReserva;
+                }
+                idReserva++;
+            }
         } else {
             System.out.println("La lista de clientes esta vacia, cree alguno para empezar.");
         }
-
     }
 
     public static void mostrarReservas(HashMap<Integer, Reserva> listaReservas) {
-        if (listaReservas.size() != 0) {
+        if (!listaReservas.isEmpty()) {
             for (Map.Entry<Integer, Reserva> e : listaReservas.entrySet()) {
                 System.out.println("ID: " + e.getValue().getIdReserva() + " Nombre Completo: "
                         + e.getValue().getCliente().getNombreCompleto() + " Parcela: " + e.getValue().getNumParcela()
@@ -359,7 +349,7 @@ public class Tumanov_Yevgen_TareaUT7 {
 
     public static void eliminarReservas(HashMap<Integer, Reserva> listaReservas, HashMap<Integer, Cliente> listaClientes, int parcelasDias[][]) {
         int idREliminar;
-        if (listaReservas.size() != 0) {
+        if (!listaReservas.isEmpty()) {
             for (Map.Entry<Integer, Reserva> e : listaReservas.entrySet()) {
                 System.out.println("ID: " + e.getValue().getIdReserva() + " Nombre Completo: "
                         + e.getValue().getCliente().getNombreCompleto() + " Parcela: " + e.getValue().getNumParcela()
@@ -377,5 +367,4 @@ public class Tumanov_Yevgen_TareaUT7 {
             System.out.println("La lista de reservas esta vacia, cree alguna para empezar.");
         }
     }
-
 }
